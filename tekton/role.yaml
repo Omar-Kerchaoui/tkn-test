@@ -1,0 +1,20 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: nodejs-pipeline-role # The name of the role
+rules:
+  - apiGroups: ["extensions", "apps", ""]
+    resources: ["services", "deployments", "pods", "pvc", "job"]
+    verbs: ["get", "create", "update", "patch", "list", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: nodejs-pipeline-role-binding # The name of the role binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: nodejs-pipeline-role # The role this role-binding will use
+subjects:
+  - kind: ServiceAccount
+    name: tkn-sa # The service account this role-binding gives access to

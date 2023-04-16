@@ -1,0 +1,60 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: nodejs-pipeline # The name of the pipeline
+spec:
+  params:
+    - name: IMAGE
+      description: Image description
+      type: string
+      default: "salaheddine10/covid"
+    - name: TAG
+      description: Preferred tag
+      default: latest
+  workspaces:
+    - name: node-workspace
+
+  tasks:
+    - name: fetch-repository # The name of the first task
+      taskRef:
+        name: git-clone # The task this pipeline should run first (git-clone task)
+      workspaces:
+        - name: output
+          workspace: node-workspace
+      params:
+        - name: url
+          value: https://github.com/Salah-boutayeb/tkn-test.git # The GitHub repository
+        - name: subdirectory
+          value: ""
+        - name: deleteExisting
+          value: "true"
+    - name: build-push-image # The name of the second task
+
+      taskRef:
+        name: buildah # The task second task this pipeline should run
+      runAfter:
+        - fetch-repository # Indicates this task should run after the "first-repository" task
+      workspaces:
+        - name: output
+          workspace: node-workspace
+
+      params:
+        - name: IMAGE
+          value: "$(params.IMAGE):$(params.TAG)" # The Docker image and the tag
+        - name: CONTEXT
+          value: "" # The path or directory that contains the Dockerfile
+        - name: FORMAT
+          value: "docker"
+    - name: create-deployment # The name of the third and final task
+      taskRef:
+        name: kubernetes-actions # The name of the task this pipeline should use
+      runAfter:
+        - build-push-image
+      workspaces:
+        - name: manifest-dir
+          workspace: node-workspace
+      params:
+        - name: script
+          value: |
+            kubectl delete -f deploymentservice.yml
+            kubectl apply -f deploymentservice.yml

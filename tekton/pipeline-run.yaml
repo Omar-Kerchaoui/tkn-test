@@ -1,0 +1,28 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: nodejs-pipelinerun # The name of the pipeline.
+spec:
+  serviceAccountName: tkn-sa # The service account to access your DockerHub account.
+  pipelineRef:
+    name: nodejs-pipeline # References the pipeline used in this PipelineRun.
+  podTemplate:
+    securityContext:
+      fsGroup: 65532 # non-root UID 65532, which allows the git-clone task command.
+  params:
+    - name: IMAGE
+      value: "docker.io/salaheddine10/covid" # The image name as a parameter in nodejs-pipeline.
+    - name: TAG
+      value: latest
+  workspaces:
+    - name: node-workspace # The workspace used in the pipeline
+      volumeClaimTemplate:
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 25Gi
+    # - name: dockerconfig-ws
+    #   secret:
+    #     secretName: dockerconfig-secret
