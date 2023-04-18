@@ -11,7 +11,7 @@ spec:
       fsGroup: 65532 # non-root UID 65532, which allows the git-clone task command.
   params:
     - name: IMAGE
-      value: "docker.io/salaheddine10/covid" # The image name as a parameter in nodejs-pipeline.
+      value: "docker.io/omarkerdev/tkn-test" # The image name as a parameter in nodejs-pipeline.
     - name: TAG
       value: latest
   workspaces:

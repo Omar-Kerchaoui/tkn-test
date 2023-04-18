@@ -45,7 +45,7 @@ spec:
           value: "" # The path or directory that contains the Dockerfile
         - name: FORMAT
           value: "docker"
-    - name: create-deployment # The name of the third and final task
+    - name: creakubete-deployment # The name of the third and final task
       taskRef:
         name: kubernetes-actions # The name of the task this pipeline should use
       runAfter:
@@ -56,5 +56,5 @@ spec:
       params:
         - name: script
           value: |
-            kubectl delete -f deploymentservice.yml
-            kubectl apply -f deploymentservice.yml
+            kubectl delete -f k8s
+            kubectl apply -f k8s
